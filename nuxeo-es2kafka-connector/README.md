@@ -1,15 +1,6 @@
-# About 
+# About Nuxeo ES Replicator
 
-The goal is to build a pipeline to replicate elasticsearch indexes between 2 remote Nuxeo instances.
-
-The pipe uses Kafka as vehicle to transmit operations between the source and the destination Nuxeo instance.
-
-This pipe is composed of 2 parts:
-
- - a part that logs Nuxeo ES related operation inside Kafka
- 	- this part is a Nuxeo Plugin
- - a part that moves data from Kafka to ES
- 	- this part if a custom kafka connect 
+The goal of this module is to provide a way to replicate the `elsaticsearch` index between 2 Nuxeo clusters deployed on 2 datacenters.
 
 ## Why not simply using LogStash
 
@@ -34,6 +25,38 @@ While technically we could have a script that runs LogStash in a loop changing t
 Looking at the [connector page](https://www.confluent.io/product/connectors/), it seems that the 3 linked opensource connectors are actually doing `Kafka => ES` and not the reverse.
 
 This means we are still missing the first part of our pipe.
+
+## Send App level OpLog in nuxeo-stream
+
+This module allows to queue indexing command using `nuxeo-streams` so that the flow of indexing commands can be replicated in order to keep an off-site Nuxeo + Index up to date.
+
+Until we update the ES indexing inside the platform to go through nuxeo-streams as it is done for the audit trail, the idea in this addon is to do the work as the elasticsearch client level.
+
+Thia addon contribute a custom client for elasticsearch that in addition of sending the command to the local ES cluster also stored the commands in a log using nuxeo-stream.
+
+                                  ===> ES Cluster (local)
+    Nuxeo => ESDuplicatorClient ==
+                                  ===> Kafka ===> LogStash/Connector => ES Cluster (remote)
+
+NB: the remote part if more likely to be a Kafka Connector that a simple LogStash.
+
+# Status
+
+ - initial implementation of the ES => stream 
+ 
+
+# Configuration
+
+## nuxeo.conf
+
+    kafka.enabled=true
+
+# Requirements
+
+This module requires Java 8 and Maven 3.
+
+# Building
+ 
 
 # Licensing
  
