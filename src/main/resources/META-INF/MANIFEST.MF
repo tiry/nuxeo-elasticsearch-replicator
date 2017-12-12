@@ -1,0 +1,11 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: Nuxep
+Bundle-Version: 1.0.0
+Bundle-Name: nuxeo-audit-storage
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.nuxeo.elasticsearch.stream;singleton=true
+Nuxeo-Component: OSGI-INF/elasticsearch-stream-contrib.xml,
+ OSGI-INF/elasticsearch-duplicator-contrib.xml
+

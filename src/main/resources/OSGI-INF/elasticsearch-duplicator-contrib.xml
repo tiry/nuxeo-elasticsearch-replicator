@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.elasticsearch.duplicatorclient">
+
+  <require>org.nuxeo.elasticsearch.defaultConfig</require>
+  <require>org.nuxeo.elasticsearch.stream.oplog</require>
+
+  <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent" point="elasticSearchClient">
+   <elasticSearchClient class="org.nuxeo.elasticsearch.client.ESDuplicatorClientFactory">
+    <option name="addressList"></option>
+    <option name="clusterName">nuxeoCluster</option>
+    <option name="clientTransportSniff">false</option>
+    <option name="clientTransportIgnoreClusterName">false</option>
+    <option name="clientTransportPingTimeout">5s</option>
+    <option name="clientTransportNodesSamplerInterval">5s</option>
+   </elasticSearchClient>
+  </extension>
+  
+</component>
