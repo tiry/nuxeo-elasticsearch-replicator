@@ -1,9 +1,17 @@
 # About 
 
+This module provide a Kafka Connector that uses elasticsearch as a sink.
+
+Unlike other available connector this Connector handle:
+
+ - INDEX/UPDATE/DELETE
+ - Index configuration and mapping
+
+The idea is to be able to replicate the ES con figuration changes that are driven by the application so that the newly indexed document will benefit from the mapping change even if the standby servers have not been started (meaning the ES mapping can not have been deployed by the Nuxeo servers). 
+
 # Status
 
- - initial implementation of the ES => stream  
-
+Basic implementation: should be ready for a real life test.
 
 # Requirements
 
@@ -13,25 +21,30 @@ This module requires Java 8 and Maven 3.
 
 Run the Maven build:
 
-   mvn clean insta;;
+   mvn clean install
 
 # Configuration
 
-**Define the Kafka Connect plugin**
+**Configure Kafka Connect **
 
-Edit `config/connect-standalone.properties` (or the config you use to start Kafka Connect) and give a value to `plugin.path` 
+Kafka connect needed to be configured so that the nuxeo plugin will be found: this means you need to provide a value for `plugin.path`, typically in the defaul configuration file (`config/connect-standalone.properties`).
 
-**Copy the Uber jar inside the plugin directory**
+However, because Kafka is fed via `nuxeo-stream` , we can not use the standard converters and marshaller.
 
-Use the jar locared in `target/nuxeo-kafka2es-connect-1.0.0-SNAPSHOT-jar-with-dependencies.jar`
+You can directly use the configuration file provided in `kafka2es-connector/connect-standandalone-nuxeo.properties` (and edit the `plugin.path` accordingly).
+
+**Deploy the  Nuxeo Kafka Connect Plugin**
+
+Use the Uber jar locared in `target/nuxeo-kafka2es-connect-1.0.0-SNAPSHOT-jar-with-dependencies.jar`
 
 **Copy and edit the connector configuration**
 
 Copy and edit the configuration file located in `kafka2es-connector/connect-es-sink.properties`;
 
-Because we use nuxei-stream format and not standard JSON, you will also need to copy
+You want to edit the 2 parameters to locate your target ES cluster:
 
-`kafka2es-connector/connect-standandalone-nuxeo.properties`.
+    es.host=127.0.0.1
+    es.port=9201
 
 # Starting the connector
 

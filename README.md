@@ -29,11 +29,9 @@ While technically we could have a script that runs LogStash in a loop changing t
  - the cost on the ES side may end up being significant
  - this will not work for deletion
 
-## Using Kafka Connect
+## Big picture
 
-Looking at the [connector page](https://www.confluent.io/product/connectors/), it seems that the 3 linked opensource connectors are actually doing `Kafka => ES` and not the reverse.
-
-This means we are still missing the first part of our pipe.
+<img src="https://www.lucidchart.com/publicSegments/view/2649d206-b4c6-427d-873a-3c29a6f23624/image.png" width="700px"></img>
 
 # Licensing
  

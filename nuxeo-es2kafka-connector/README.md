@@ -44,10 +44,11 @@ NB: the remote part if more likely to be a Kafka Connector that a simple LogStas
 
  - initial implementation of the ES => stream 
  
-
 # Configuration
 
 ## nuxeo.conf
+
+You need to unable Kafka integration.
 
     kafka.enabled=true
 
