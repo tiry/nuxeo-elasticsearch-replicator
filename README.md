@@ -34,6 +34,11 @@ Until we update the ES indexing inside the platform to go through nuxeo-streams 
 
 Thia addon contribute a custom client for elasticsearch that in addition of sending the command to the local ES cluster also stored the commands in a log using nuxeo-stream.
 
+                                  ===> ES Cluster (local)
+    Nuxeo => ESDuplicatorClient ==
+                                  ===> Kafka ===> LogStash/Connector => ES Cluster (remote)
+
+NB: the remote part if more likely to be a Kafka Connector that a simple LogStash.
 
 # Status
 
