@@ -4,16 +4,39 @@
 
  - initial implementation of the ES => stream  
 
-# Configuration
-
 
 # Requirements
 
 This module requires Java 8 and Maven 3.
 
 # Building
- 
 
+Run the Maven build:
+
+   mvn clean insta;;
+
+# Configuration
+
+**Define the Kafka Connect plugin**
+
+Edit `config/connect-standalone.properties` (or the config you use to start Kafka Connect) and give a value to `plugin.path` 
+
+**Copy the Uber jar inside the plugin directory**
+
+Use the jar locared in `target/nuxeo-kafka2es-connect-1.0.0-SNAPSHOT-jar-with-dependencies.jar`
+
+**Copy and edit the connector configuration**
+
+Copy and edit the configuration file located in `kafka2es-connector/connect-es-sink.properties`;
+
+Because we use nuxei-stream format and not standard JSON, you will also need to copy
+
+`kafka2es-connector/connect-standandalone-nuxeo.properties`.
+
+# Starting the connector
+
+    bin/connect-standalone.sh config/connect-standalone-nuxeo.properties config/connect-es-sink.properties
+    
 # Licensing
  
 This module is licensed under the GNU Lesser General Public License (LGPL) version 2.1 (http://www.gnu.org/licenses/lgpl-2.1.html).
