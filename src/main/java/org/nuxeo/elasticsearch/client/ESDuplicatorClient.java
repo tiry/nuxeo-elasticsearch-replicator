@@ -52,8 +52,7 @@ import org.nuxeo.runtime.stream.StreamService;
  * @since 9.3
  */
 public class ESDuplicatorClient extends ESRestClient {
-	// TODO: add security sanitizer to make sure all parameters used to build
-	// requests are clean
+
 	private static final Log log = LogFactory.getLog(ESDuplicatorClient.class);
 
 	protected final String ES_OPLOG_CONFIG_PROP = "nuxeo.stream.es.oplog.config";
@@ -111,7 +110,7 @@ public class ESDuplicatorClient extends ESRestClient {
 		}
 	}
 
-	protected void writeOp(String cmd, String indexName, String jsonPayload, Map<String, Serializable> map) {
+	protected void writeOp(String cmd, String indexName, Map<String, Serializable> map) {
 		if (map == null) {
 			map = new HashMap<>();
 		}
@@ -121,9 +120,6 @@ public class ESDuplicatorClient extends ESRestClient {
 		if (indexName != null) {
 			map.put("index", indexName);
 		}
-		if (jsonPayload != null) {
-			map.put("jsonPayload", jsonPayload);
-		}
 		addOpToLog(asJson(map));
 	}
 
@@ -132,13 +128,15 @@ public class ESDuplicatorClient extends ESRestClient {
 		super.deleteIndex(indexName, timeoutSecond);
 		Map<String, Serializable> map = new HashMap<>();
 		map.put("timeoutSecond", Integer.toString(timeoutSecond));
-		writeOp("deleteIndex", indexName, null, map);
+		writeOp("deleteIndex", indexName, map);
 	}
 
 	@Override
 	public void createIndex(String indexName, String jsonSettings) {
 		super.createIndex(indexName, jsonSettings);
-		writeOp("createIndex", indexName, jsonSettings, null);
+		Map<String, Serializable> map = new HashMap<>();
+		map.put("jsonSettings", jsonSettings);
+		writeOp("createIndex", indexName, map);
 	}
 
 	@Override
@@ -146,7 +144,8 @@ public class ESDuplicatorClient extends ESRestClient {
 		super.createMapping(indexName, type, jsonMapping);
 		Map<String, Serializable> map = new HashMap<>();
 		map.put("type", type);
-		writeOp("createMapping", indexName, jsonMapping, map);
+		map.put("jsonMapping", jsonMapping);
+		writeOp("createMapping", indexName, map);
 	}
 
 	@Override
@@ -165,14 +164,14 @@ public class ESDuplicatorClient extends ESRestClient {
 		super.deleteAlias(aliasName);
 		Map<String, Serializable> map = new HashMap<>();
 		map.put("aliasName", aliasName);
-		writeOp("deleteAlias", null, null, map);
+		writeOp("deleteAlias", null, map);
 	}
 
 	protected void createAlias(String aliasName, String indexName) {
 		super.createAlias(aliasName, indexName);
 		Map<String, Serializable> map = new HashMap<>();
 		map.put("aliasName", aliasName);
-		writeOp("createAlias", null, null, map);
+		writeOp("createAlias", indexName, map);
 	}
 
 	@Override
@@ -187,24 +186,29 @@ public class ESDuplicatorClient extends ESRestClient {
 
 			if (req.opType() == OpType.INDEX) {
 				data = extractMetaData((IndexRequest) req);
-			}
-			if (req.opType() == OpType.UPDATE) {
+			} else if (req.opType() == OpType.UPDATE) {
 				data = extractMetaData((UpdateRequest) req);
+			} else if (req.opType() == OpType.DELETE) {
+				data = extractMetaData((DeleteRequest) req);
+			} else {
+				data.put("opType", req.opType().name());
 			}
 
+			data.put("index", req.index());
 			dataList.add(data);
 		}
 
 		Map<String, Serializable> map = new HashMap<>();
 		map.put("requests", dataList);
-		writeOp("bulk", null, request.toString(), map);
+		writeOp("bulk", null, map);
 		return response;
 	}
 
 	@Override
 	public DeleteResponse delete(DeleteRequest request) {
 		DeleteResponse response = super.delete(request);
-		writeOp("delete", null, request.toString(), null);
+		Map<String, Serializable> map = extractMetaData(request);
+		writeOp("delete", request.index(), map);
 		return response;
 	}
 
@@ -212,7 +216,7 @@ public class ESDuplicatorClient extends ESRestClient {
 	public IndexResponse index(IndexRequest request) {
 		IndexResponse response = super.index(request);
 		Map<String, Serializable> data = extractMetaData(request);
-		writeOp("index", null, request.toString(), data);
+		writeOp("index", request.index(), data);
 		return response;
 	}
 
@@ -247,6 +251,15 @@ public class ESDuplicatorClient extends ESRestClient {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return data;
+	}
+
+	protected Map<String, Serializable> extractMetaData(DeleteRequest request) {
+		Map<String, Serializable> data = new HashMap<>();
+		data.put("type", request.type());
+		data.put("index", request.index());
+		data.put("opType", request.opType().name());
+		data.put("id", request.id());
 		return data;
 	}
 

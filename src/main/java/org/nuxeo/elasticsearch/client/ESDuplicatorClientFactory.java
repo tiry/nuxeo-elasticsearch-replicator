@@ -42,7 +42,7 @@ public class ESDuplicatorClientFactory extends ESRestClientFactory  {
 
     @Override
     public ESClient create(ElasticSearchEmbeddedNode node, ElasticSearchClientConfig config) {
-        if (node != null) {
+    	if (node != null) {
             return createLocalRestClient(node.getConfig());
         }
         return createRestClient(config);

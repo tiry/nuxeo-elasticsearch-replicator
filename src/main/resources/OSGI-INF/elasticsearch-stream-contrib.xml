@@ -4,8 +4,9 @@
  <require>org.nuxeo.stream.defaultConfig</require>
 
   <extension point="logConfig" target="org.nuxeo.runtime.stream.service">
-     <logConfig name="esoplog" type="chronicle">
-       <option name="retention">2d</option>
+     <logConfig name="esoplog" type="kafka">
+        <option name="kafkaConfig">default</option>
+        <log name="esoplog" size="1" />
      </logConfig>
   </extension>
   
